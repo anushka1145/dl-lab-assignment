@@ -3622,3 +3622,5 @@ pip install matplotlib
 pip install scikit-learn
 pip install seaborn
 pip install tensorflow
+
+python -m pip install scikit-learn
