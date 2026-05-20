@@ -1,0 +1,3609 @@
+DL LAB ASSIGNMENT 1
+
+This code performs PCA (Principal Component Analysis) on the Iris dataset to reduce dimensions and visualize the data in 2D. Since you’re studying deep learning/data science, this is a classic dimensionality reduction technique used before modeling or for visualization.
+
+What PCA means (concept)
+
+PCA = Principal Component Analysis
+It reduces a dataset with many features into fewer features while keeping most of the important information.
+
+Example:
+Your Iris dataset has 4 features:
+
+sepal length
+sepal width
+petal length
+petal width
+
+PCA converts these into new variables called principal components:
+
+PC1 → captures maximum variance
+PC2 → captures second highest variance
+
+These are combinations of original features, but they retain most of the data patterns.
+
+Why PCA is used
+
+Uses of PCA:
+
+Reduce number of features
+Remove unnecessary dimensions
+Faster training
+Better visualization
+Removes correlation between features
+
+For machine learning/deep learning:
+PCA helps simplify data before classification.
+
+Code Explanation
+Import libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+Meaning:
+numpy → mathematical operations
+pandas → dataframe
+matplotlib → graphs
+StandardScaler → normalize data
+PCA → dimensionality reduction algorithm
+Load dataset
+from sklearn.datasets import load_iris
+data = load_iris()
+X = pd.DataFrame(data.data, columns=data.feature_names)
+y = data.target
+
+About Iris dataset:
+
+data.data = input features
+data.target = class labels (flower type)
+X contains:
+
+4 numerical columns:
+
+Feature
+Sepal length
+Sepal width
+Petal length
+Petal width
+y contains class:
+0 → Setosa
+1 → Versicolor
+2 → Virginica
+Display original data
+print("Original Data Shape:", X.shape)
+print(X.head())
+Output:
+150 rows
+4 columns
+
+Shape:
+
+(150,4)
+
+Meaning:
+
+150 flower samples with 4 features.
+
+Standardization
+Why standardization is needed?
+
+PCA works based on variance.
+If one feature has large values, it dominates.
+
+So first we normalize.
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+What StandardScaler does
+
+Formula:
+
+z=
+σ
+x−μ
+	​
+
+
+Where:
+
+x = original value
+μ = mean
+σ = standard deviation
+
+This makes:
+
+mean = 0
+standard deviation = 1
+Output
+print(X_scaled[:5])
+
+Shows normalized values.
+
+PCA Implementation
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+This reduces:
+
+From:
+
+4 dimensions
+
+To:
+
+2 dimensions
+
+Inline, the transformation concept is:
+
+X
+4D
+	​
+
+→X
+2D
+	​
+
+
+n_components=2
+
+Means:
+
+Keep only 2 principal components:
+
+PC1
+PC2
+Reduced shape
+print(X_pca.shape)
+
+Output:
+
+(150,2)
+
+Now:
+
+150 rows
+2 columns
+Explained Variance Ratio
+print(pca.explained_variance_ratio_)
+
+This tells:
+
+How much information each principal component retains.
+
+Example:
+
+[0.729, 0.229]
+
+Meaning:
+
+Component	Information retained
+PC1	72.9%
+PC2	22.9%
+
+Total = ~95%
+
+So only 2 features still preserve most data.
+
+Scree Plot
+pca_full = PCA()
+X_pca_full = pca_full.fit_transform(X_scaled)
+
+This checks all components.
+
+Graph
+plt.plot(...)
+Scree plot shows:
+
+Principal component vs variance.
+
+
+Why scree plot?
+
+Helps decide:
+
+How many components to keep.
+
+If first 2 components explain most variance → keep 2.
+
+2D Visualization
+plt.scatter(X_pca[:,0], X_pca[:,1], c=y)
+
+This plots:
+
+X-axis → PC1
+Y-axis → PC2
+color → class label
+Meaning
+
+Different flower classes appear in clusters.
+
+You can visually see separation.
+
+
+Important Concepts Used
+
+Your code includes:
+
+1. Dataset loading
+
+Using:
+
+scikit-learn
+
+2. Feature scaling
+
+Standardization
+
+3. Dimensionality reduction
+
+PCA
+
+4. Variance analysis
+
+Explained variance ratio
+
+5. Visualization
+
+Scatter plot + Scree plot
+
+DL LAB ASSIGNMENT 2
+Concept Used
+
+Main concept:
+
+Linear Regression
+
+Linear regression predicts a numerical value using input features.
+
+Example:
+
+Predict:
+
+house price
+salary
+sales
+marks
+
+based on input variables.
+
+Types used in your code
+1. Simple Linear Regression
+
+Uses only one independent variable.
+
+Here:
+
+Area → Price
+
+Meaning:
+House price prediction based only on area.
+
+2. Multiple Linear Regression
+
+Uses multiple variables.
+
+Here:
+
+Area
+Bedrooms
+Age
+
+to predict:
+
+Price
+Formula
+
+Simple linear regression:
+
+y=mx+c
+m
+b
+-10
+-8
+-6
+-4
+-2
+2
+4
+6
+8
+10
+-10
+-5
+5
+10
+y-intercept
+x-intercept
+
+Where:
+
+y = dependent variable (Price)
+x = independent variable (Area)
+m = slope
+c = intercept
+
+Multiple linear regression:
+
+y=b
+0
+	​
+
++b
+1
+	​
+
+x
+1
+	​
+
++b
+2
+	​
+
+x
+2
+	​
+
++b
+3
+	​
+
+x
+3
+	​
+
+
+Where:
+
+x₁ = Area
+x₂ = Bedrooms
+x₃ = Age
+Code Explanation
+Import libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+Uses:
+numpy → calculations
+pandas → dataset
+matplotlib → graphs
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, r2_score
+
+From scikit-learn:
+
+Used for ML operations.
+
+Load dataset
+df = pd.read_csv("house_prices.csv")
+
+Reads CSV file into dataframe.
+
+Dataset columns likely:
+
+Area	Bedrooms	Age	Price
+Show data
+print(df.head())
+
+Shows first 5 rows.
+
+Check missing values
+df.isnull().sum()
+
+Checks null values.
+
+Example:
+
+If any cell empty.
+
+Preprocessing
+Missing value handling
+df.fillna(df.mean(numeric_only=True), inplace=True)
+
+Meaning:
+
+Replace missing values with mean.
+
+Example:
+
+Area column:
+
+1000, 1200, NaN, 1300
+
+Mean = 1166
+
+NaN replaced by 1166.
+
+Simple Linear Regression
+Select input/output
+X_simple = df[['Area']]
+y = df['Price']
+
+X = independent feature
+y = target variable
+
+Train-test split
+train_test_split()
+
+Splits data:
+
+80% training
+20% testing
+
+Used to evaluate model.
+
+Why split?
+
+Training:
+
+Learn pattern
+
+Testing:
+
+Check performance
+
+Standardization
+scaler_simple = StandardScaler()
+
+Converts values into standard scale.
+
+Formula:
+
+z=
+σ
+x−μ
+	​
+
+x
+μ
+σ
+z=
+σ
+x−μ
+	​
+
+≈1.2
+Φ(z)≈88.5%
+
+Why:
+
+Improves performance.
+
+Model creation
+simple_model = LinearRegression()
+
+Creates linear regression object.
+
+Training
+simple_model.fit(X_train_scaled, y_train)
+
+Model learns relationship:
+
+Area ↔ Price
+
+Prediction
+y_pred_simple = simple_model.predict(X_test_scaled)
+
+Predicts prices.
+
+Evaluation metrics
+MSE
+mean_squared_error()
+
+Formula:
+
+MSE=
+n
+1
+	​
+
+∑(y
+i
+	​
+
+−
+y
+^
+	​
+
+i
+	​
+
+)
+2
+
+Meaning:
+
+Average squared error.
+
+Lower = better.
+
+RMSE
+rmse = sqrt(MSE)
+
+Formula:
+
+RMSE=
+MSE
+	​
+
+
+Same unit as target.
+
+R² score
+r2_score()
+
+Formula:
+
+R
+2
+=1−
+SS
+tot
+	​
+
+SS
+res
+	​
+
+	​
+
+
+Meaning:
+
+How well model fits.
+
+Range:
+
+1 → perfect
+0 → poor
+Graph 1
+
+Simple regression graph.
+
+plt.scatter()
+
+Blue = actual
+Red = predicted
+Green = regression line
+
+
+Multiple Linear Regression
+
+Now model uses 3 features.
+
+Features
+X_multi = df[['Area', 'Bedrooms', 'Age']]
+
+Uses:
+
+Area
+Bedrooms
+Age
+Training
+
+Same steps:
+
+split
+scale
+fit
+predict
+Visualization
+plt.scatter(y_test, y_pred_multi)
+
+Actual vs predicted.
+
+If points close to diagonal:
+
+good model.
+
+
+Final Comparison
+
+Compares:
+
+Simple vs Multiple.
+
+print()
+
+Shows:
+
+MSE
+RMSE
+R²
+Which model is better?
+
+Usually:
+
+Multiple Linear Regression
+
+Because:
+
+More features give better prediction.
+
+DL LAB ASSIGNMENT 3
+Concept Used
+K-Nearest Neighbors (KNN)
+
+KNN means:
+
+K = number of nearest neighbors
+
+The algorithm classifies a new data point by checking the nearest existing points.
+
+Simple idea:
+
+It predicts based on nearby similar data.
+
+Example
+
+Suppose a flower has:
+
+petal length = 5.2
+petal width = 1.8
+
+KNN checks nearest flowers in dataset and assigns the majority class.
+
+How KNN works
+
+Steps:
+
+Store training data
+Take new test point
+Calculate distance from all points
+Find nearest K points
+Majority vote
+Assign class
+Formula used
+
+Distance is usually Euclidean:
+
+d=
+∑
+i=1
+n
+	​
+
+(x
+i
+	​
+
+−y
+i
+	​
+
+)
+2
+	​
+
+
+This calculates distance between two points.
+
+Code Explanation
+Import libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+From scikit-learn:
+
+Used for ML tasks.
+
+Load dataset
+data = pd.read_csv("iris (1).csv")
+
+Loads Iris dataset.
+
+Dataset columns
+
+Usually:
+
+sepal_length	sepal_width	petal_length	petal_width	species
+Separate input and output
+X = data.drop("species", axis=1)
+y = data["species"]
+X
+
+Features:
+
+sepal length
+sepal width
+petal length
+petal width
+y
+
+Target:
+
+species
+
+Train-test split
+train_test_split()
+
+Splits:
+
+70% training
+30% testing
+Why split?
+
+Training:
+
+learn patterns
+
+Testing:
+
+check prediction
+
+Create KNN model
+knn = KNeighborsClassifier(n_neighbors=3)
+
+This means:
+
+K = 3
+
+So it checks 3 nearest neighbors.
+
+Why 3?
+
+Nearest 3 data points decide class.
+
+Majority vote.
+
+Example:
+
+3 neighbors:
+
+Setosa
+Setosa
+Versicolor
+
+Prediction = Setosa
+
+Train model
+knn.fit(X_train, y_train)
+
+Stores training data.
+
+KNN doesn’t create formula.
+
+It memorizes data.
+
+Predict
+y_pred = knn.predict(X_test)
+
+Predicts flower species.
+
+Correct predictions
+for actual, predicted in zip()
+
+Compares:
+
+actual vs predicted.
+
+If same:
+
+correct.
+
+Wrong predictions
+
+Prints misclassified samples.
+
+Useful for analysis.
+
+Accuracy
+accuracy = knn.score(X_test, y_test)
+
+Formula:
+
+Accuracy=
+Total Predictions
+Correct Predictions
+	​
+
+
+Example
+
+If:
+
+45 tested
+43 correct
+
+Then:
+
+Accuracy = 43/45 = 95.5%
+
+Workflow
+Load dataset
+↓
+Separate X and y
+↓
+Split train/test
+↓
+Create KNN
+↓
+Train
+↓
+Predict
+↓
+Compare
+↓
+Accuracy
+Visualization
+
+KNN works based on nearest distance.
+
+Imagine:
+
+5
+Important Concepts Used
+1. Supervised Learning
+
+Target label known.
+
+species available.
+
+2. Classification
+
+Output is category:
+
+flower type.
+
+3. Distance-based learning
+
+Uses distance.
+
+4. Lazy learner
+
+KNN is called lazy because:
+
+No training formula.
+
+Only stores data.
+
+Why KNN is called lazy learning?
+
+Because:
+
+Training is simple.
+
+Most work happens during prediction.
+
+Role of K
+
+Very important.
+
+Small K
+
+Example K=1
+
+Can overfit.
+
+Large K
+
+Example K=20
+
+May underfit.
+
+Why choose K=3?
+
+Balanced.
+
+Not too small
+Not too large.
+
+Viva Questions
+
+Common:
+
+What is KNN?
+
+Classification based on nearest neighbors.
+
+Why KNN called lazy learner?
+
+No model building.
+
+Stores data.
+
+What is K?
+
+Number of neighbors.
+
+What distance used?
+
+Euclidean distance.
+
+What is classification?
+
+Predict categorical class.
+
+Difference between regression and classification?
+
+Regression:
+
+continuous output.
+
+Classification:
+
+categorical output.
+
+Real-life applications
+
+KNN used in:
+
+face recognition
+recommendation
+medical diagnosis
+handwriting recognition
+image classification
+
+DL LAB ASSIGNMENT 4 with dataset
+Concept Used
+Naive Bayes
+
+Naive Bayes is based on:
+
+Bayes Theorem
+P(A∣B)=
+P(B)
+P(B∣A)P(A)
+	​
+
+P(A)
+P(B∣A)
+P(B∣¬A)
+P(A∣B)=
+P(B)
+P(B∣A)P(A)
+	​
+
+≈0.68,P(B)≈0.25
+P(B)=0.25
+P(B|A)P(A)=0.17
+P(A|B)~0.68
+Posterior = useful evidence / total evidence
+
+Meaning:
+
+Probability of event A given B.
+
+In your case
+
+It predicts whether news is:
+
+Fake
+Real
+
+based on words:
+
+breaking
+shocking
+exclusive
+Why called “Naive”?
+
+Because it assumes all features are independent.
+
+Example:
+
+It assumes:
+
+breaking
+shocking
+exclusive
+
+do not affect each other.
+
+That assumption is called naive.
+
+Your Problem
+
+Classify news headline into:
+
+Fake
+Real
+Code Explanation
+Import
+import pandas as pd
+
+Used for handling CSV dataset.
+
+Load dataset
+df = pd.read_csv("news.csv")
+
+Reads news dataset.
+
+About your dataset:
+
+Likely:
+
+breaking	shocking	exclusive	label
+1	1	1	Fake
+0	1	0	Real
+Convert dataframe
+data = df.to_dict(orient="records")
+
+Converts rows to dictionary.
+
+Example:
+
+{"breaking":1,"shocking":0,"exclusive":1,"label":"Fake"}
+Vocabulary
+vocab = ["breaking","shocking","exclusive"]
+
+These are features.
+
+These words help classify news.
+
+Class labels
+classes = list(df["label"].unique())
+
+Gets:
+
+Fake
+Real
+Count total documents
+total_docs = len(data)
+
+Total rows.
+
+Count class frequency
+class_counts = {}
+
+Counts:
+
+How many fake and real.
+
+Example:
+
+Class	Count
+Fake	6
+Real	4
+Prior Probability
+
+This is important.
+
+Prior
+
+Probability of class before seeing features.
+
+Formula:
+
+P(Class)=
+Total documents
+Number of class
+	​
+
+
+Code
+priors = {c: class_counts[c]/total_docs}
+
+Example:
+
+If:
+
+Fake = 6
+Total = 10
+
+Then:
+
+P(Fake)=0.6
+
+Word count
+word_counts
+
+Counts occurrences of each word in each class.
+
+Example:
+
+Fake:
+
+breaking → 5
+shocking → 4
+exclusive → 6
+
+Total words
+total_words
+
+Stores total feature count per class.
+
+Likelihood
+
+Most important part.
+
+Likelihood
+
+Probability of word given class.
+
+Formula:
+
+P(word∣class)=
+TotalWords+V
+Count(word)+1
+	​
+
+
+Why +1 ?
+
+Laplace smoothing.
+
+Laplace Smoothing
+
+Used to avoid zero probability.
+
+Without it:
+
+If one word absent → total probability becomes zero.
+
+So add 1.
+
+V
+V = len(vocab)
+
+Vocabulary size.
+
+Here:
+
+3 words.
+
+Prediction function
+def predict(test_input):
+
+Predicts class.
+
+How prediction works
+
+For each class:
+
+Multiply:
+
+prior
+likelihood of each word
+Formula
+
+P(Class∣Data)∝P(Class)∏P(word
+i
+	​
+
+∣Class)
+
+Example
+
+Input:
+
+breaking=1
+shocking=1
+exclusive=0
+
+Compute:
+
+Fake probability
+Real probability
+
+Choose maximum.
+
+Test data
+test_data = [...]
+
+New unseen samples.
+
+Compare
+actual vs predicted
+
+Prints:
+
+actual label
+predicted label
+
+Accuracy
+
+Formula:
+
+Accuracy=
+Total
+Correct
+	​
+
+×100
+
+Workflow
+Load dataset
+↓
+Read features
+↓
+Calculate prior
+↓
+Calculate likelihood
+↓
+Apply Bayes theorem
+↓
+Predict class
+↓
+Compare
+↓
+Accuracy
+Visualization
+
+Naive Bayes concept:
+
+4
+Concepts used
+1. Supervised learning
+
+Because labels known.
+
+2. Classification
+
+Output:
+
+Fake/Real.
+
+3. Probability
+
+Uses statistical probability.
+
+4. Bayes theorem
+
+Core algorithm.
+
+5. Laplace smoothing
+
+Avoids zero probability.
+
+Why used for text?
+
+Because text classification is easy with word probability.
+
+Used in:
+
+spam filtering
+fake news detection
+email classification
+sentiment analysis
+Viva Questions
+
+Important:
+
+What is Naive Bayes?
+
+Probabilistic classifier based on Bayes theorem.
+
+Why called naive?
+
+Assumes features independent.
+
+What is prior probability?
+
+Probability of class before input.
+
+What is likelihood?
+
+Probability of feature given class.
+
+Why Laplace smoothing?
+
+Avoid zero probability.
+
+What is posterior probability?
+
+Final probability after considering input.
+
+Easy Understanding
+
+Your code:
+
+Reads news data → calculates class probability → calculates word probability → predicts fake or real → computes accuracy.
+
+Real-life example
+
+Email spam detection.
+
+Words:
+
+win
+free
+offer
+
+If many appear → spam.
+
+Same concept.
+
+One line
+
+Naive Bayes predicts class by calculating probabilities using Bayes theorem.
+
+DL LAB ASSIGNMENT 5
+This is a combined machine learning program covering:
+
+Decision Tree Classification
+Decision Tree Pruning
+Random Forest
+AdaBoost
+Decision Tree Regression
+Cross Validation
+Model Comparison
+
+So this assignment teaches both classification and regression, plus ensemble learning.
+
+Main Concepts Used
+
+Your code uses:
+
+Classification
+
+Predict category:
+
+flower species.
+
+Regression
+
+Predict numerical value:
+
+house price.
+
+Ensemble Learning
+
+Combining multiple models.
+
+Part 1 → Decision Tree Classification
+
+Uses Iris dataset.
+
+Decision Tree Concept
+
+Decision tree makes decisions like:
+
+If-else structure.
+
+Example:
+
+Petal length < 2.5 ?
+YES → Setosa
+NO → Check next condition
+
+It creates branches.
+
+Visualization:
+
+5
+Step-by-step code
+Import libraries
+from sklearn.tree import DecisionTreeClassifier
+
+From scikit-learn.
+
+Load Iris
+data = load_iris()
+
+Dataset:
+
+sepal length
+sepal width
+petal length
+petal width
+
+Target:
+
+species.
+
+Split
+train_test_split()
+
+70% train
+30% test
+
+Create model
+dt_classifier = DecisionTreeClassifier()
+
+Creates classifier.
+
+Train
+fit()
+
+Builds tree.
+
+Predict
+predict()
+
+Classifies flowers.
+
+Accuracy
+
+Formula:
+
+Accuracy=
+Total
+Correct
+	​
+
+
+Classification Report
+
+Shows:
+
+precision
+recall
+f1-score
+Plot Tree
+plot_tree()
+
+Draws full decision tree.
+
+Part 2 → Pruning
+What is pruning?
+
+Removes unnecessary branches.
+
+Why?
+
+Avoid overfitting.
+
+Overfitting
+
+Model memorizes training data too much.
+
+Poor test performance.
+
+Pruning path
+cost_complexity_pruning_path()
+
+Finds pruning parameters.
+
+Alpha
+
+Pruning strength.
+
+Higher alpha = more pruning.
+
+Graph
+
+Shows:
+
+Train accuracy vs test accuracy.
+
+Helps choose best alpha.
+
+5
+Pruned model
+ccp_alpha=0.01
+
+Pruned tree.
+
+Part 3 → Random Forest
+Concept
+
+Random forest = many decision trees.
+
+It combines outputs.
+
+Formula idea
+
+Final prediction = majority vote.
+
+Visualization:
+
+5
+Create
+RandomForestClassifier(n_estimators=100)
+
+Means:
+
+100 trees.
+
+Why better?
+
+Reduces overfitting.
+
+Higher accuracy.
+
+Part 4 → AdaBoost
+Concept
+
+Adaptive Boosting.
+
+Builds weak learners sequentially.
+
+Each next learner corrects previous mistakes.
+
+Visualization:
+
+6
+Weak learner
+stump = DecisionTreeClassifier(max_depth=1)
+
+Stump = one-level tree.
+
+AdaBoost
+AdaBoostClassifier()
+
+Combines many stumps.
+
+Part 5 → Regression
+
+Uses California Housing dataset.
+
+Decision Tree Regression
+
+Predict numerical output.
+
+Example:
+
+house prices.
+
+Formula
+
+Regression tree splits and averages values.
+
+Train
+DecisionTreeRegressor()
+Metrics
+MSE
+
+MSE=
+n
+1
+	​
+
+∑(y
+i
+	​
+
+−
+y
+^
+	​
+
+i
+	​
+
+)
+2
+
+R²
+
+R
+2
+=1−
+SS
+tot
+	​
+
+SS
+res
+	​
+
+	​
+
+
+Part 6 → Comparison
+
+Stores all model accuracies.
+
+Table:
+
+Model	Accuracy
+Decision Tree	x
+Pruned	x
+RF	x
+AdaBoost	x
+Bar chart
+
+Shows comparison.
+
+Part 7 → Cross Validation
+
+Very important.
+
+What is cross validation?
+
+Evaluates model multiple times.
+
+5-fold
+cv=5
+
+Data divided into 5 parts.
+
+Each used as test once.
+
+Visualization:
+
+5
+Why use CV?
+
+More reliable.
+
+Less bias.
+
+Workflow
+Load iris
+↓
+Decision tree
+↓
+Pruning
+↓
+Random forest
+↓
+AdaBoost
+↓
+Compare
+↓
+Load housing
+↓
+Regression
+↓
+Cross validation
+Key Concepts Used
+1 Decision Tree
+
+Tree based classification.
+
+2 Pruning
+
+Reduce overfitting.
+
+3 Ensemble learning
+
+Combination of models.
+
+4 Random forest
+
+Many trees.
+
+5 AdaBoost
+
+Sequential weak learners.
+
+6 Regression
+
+Numerical prediction.
+
+7 Cross validation
+
+Reliable evaluation.
+
+Viva Questions
+What is decision tree?
+
+Tree-based supervised learning.
+
+What is pruning?
+
+Removing extra branches.
+
+Why random forest better?
+
+Uses many trees.
+
+Better generalization.
+
+What is AdaBoost?
+
+Boosting algorithm.
+
+What is stump?
+
+Small tree depth=1.
+
+What is ensemble learning?
+
+Combining multiple models.
+
+Difference RF vs AdaBoost?
+
+RF:
+
+parallel trees.
+
+AdaBoost:
+
+sequential.
+
+Easy Understanding
+
+Your code compares:
+
+single tree vs multiple trees vs boosting.
+
+Then checks which gives best performance.
+
+Most important result
+
+Usually:
+
+Random Forest gives best accuracy.
+
+Because:
+
+many trees reduce error.
+
+DL LAB ASSIGNMENT 6
+Main concept used
+CNN — Convolutional Neural Network
+
+CNN is mainly used for:
+
+image classification
+object detection
+face recognition
+handwriting recognition
+
+Since your assignment uses MNIST images, CNN is the right model.
+
+What your code does
+
+It:
+
+loads digit images
+preprocesses them
+builds CNN model
+trains model
+tests accuracy
+shows confusion matrix
+prints classification report
+Step-by-step explanation
+Import libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+numpy → numerical operations
+matplotlib → plotting graphs
+seaborn → confusion matrix heatmap
+Import deep learning modules
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+
+Using TensorFlow and its Keras API.
+
+Load dataset
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+Dataset contains:
+
+training images
+training labels
+testing images
+testing labels
+Shape
+print(X_train.shape)
+
+Output:
+
+(60000, 28, 28)
+
+Meaning:
+
+60000 training images
+each image size = 28 × 28
+Normalization
+X_train = X_train / 255.0
+
+Why?
+
+Pixel values are:
+
+0–255
+
+Convert into:
+
+0–1
+
+This improves training.
+
+Formula:
+
+x
+′
+=
+255
+x
+	​
+
+
+Reshape
+X_train.reshape(-1,28,28,1)
+
+CNN requires 4D input:
+
+samples
+height
+width
+channels
+
+Here:
+
+1 = grayscale channel.
+
+One-hot encoding
+to_categorical(y_train,10)
+
+Converts labels.
+
+Example:
+
+Digit 3 becomes:
+
+[0 0 0 1 0 0 0 0 0 0]
+Model creation
+model = Sequential()
+
+Sequential means layers added one by one.
+
+CNN architecture
+First convolution layer
+Conv2D(32,(3,3),activation='relu')
+
+Meaning:
+
+32 filters
+each filter = 3×3
+
+Feature extraction.
+
+Detects:
+
+edges
+shapes
+curves
+
+Visual:
+
+6
+ReLU activation
+
+Function:
+
+f(x)=max(0,x)
+
+Why?
+
+Introduces non-linearity.
+
+Negative values become 0.
+
+MaxPooling
+MaxPooling2D((2,2))
+
+Reduces size.
+
+Example:
+
+28×28 → 14×14
+
+Keeps important features.
+
+Visual:
+
+7
+Second Conv layer
+Conv2D(64,(3,3))
+
+More filters:
+
+Learns deeper features.
+
+Flatten
+Flatten()
+
+Converts 2D matrix into 1D vector.
+
+Example:
+
+feature map → array.
+
+Dense layer
+Dense(128)
+
+Fully connected layer.
+
+Learns final patterns.
+
+Dropout
+Dropout(0.3)
+
+Drops 30% neurons.
+
+Purpose:
+
+Avoid overfitting.
+
+Output layer
+Dense(10, activation='softmax')
+
+10 classes:
+
+digits 0–9.
+
+Softmax
+
+Formula:
+
+P(y
+i
+	​
+
+)=
+∑
+j
+	​
+
+e
+z
+j
+	​
+
+e
+z
+i
+	​
+
+	​
+
+
+Returns probabilities.
+
+Example:
+
+digit 7 = 0.95 probability.
+
+Compile
+model.compile()
+
+Defines:
+
+Optimizer = Adam
+
+Adam updates weights efficiently.
+
+You asked earlier about Adam — this is where it is used.
+
+Loss function
+
+categorical_crossentropy
+
+Formula:
+
+L=−∑ylog(
+y
+^
+	​
+
+)
+
+Used for multiclass classification.
+
+Training
+model.fit()
+
+Trains CNN.
+
+Parameters:
+
+epochs=10
+
+10 full training cycles.
+
+batch_size=64
+
+64 images processed together.
+
+validation_split=0.2
+
+20% training used for validation.
+
+Evaluation
+model.evaluate()
+
+Calculates test accuracy.
+
+Prediction
+model.predict()
+
+Predicts digit class.
+
+Argmax
+np.argmax()
+
+Chooses highest probability class.
+
+Example:
+
+[0.1, 0.8, 0.1]
+
+Prediction = class 1.
+
+Confusion Matrix
+
+Very important.
+
+What is confusion matrix?
+
+Shows:
+
+actual vs predicted.
+
+Example:
+
+5
+
+If row=3 column=3:
+
+correct prediction.
+
+Classification report
+
+Shows:
+
+precision
+recall
+f1-score
+Workflow
+Load MNIST
+↓
+Normalize
+↓
+Reshape
+↓
+One-hot encoding
+↓
+Build CNN
+↓
+Train
+↓
+Evaluate
+↓
+Predict
+↓
+Confusion matrix
+↓
+Classification report
+Important concepts used
+1. CNN
+
+For image recognition.
+
+2. Convolution
+
+Feature extraction.
+
+3. Pooling
+
+Reduce dimensions.
+
+4. Dropout
+
+Prevent overfitting.
+
+5. Softmax
+
+Multiclass output.
+
+6. Adam optimizer
+
+Weight optimization.
+
+7. Confusion matrix
+
+Performance analysis.
+
+Viva questions
+
+Likely:
+
+What is CNN?
+
+Deep learning model for images.
+
+Why convolution?
+
+Extract features.
+
+Why pooling?
+
+Reduce computation.
+
+Why ReLU?
+
+Non-linearity.
+
+Why softmax?
+
+Probability output.
+
+Why dropout?
+
+Prevent overfitting.
+
+Why MNIST?
+
+Standard handwritten digit dataset.
+
+Easy understanding
+
+Your code:
+
+Takes digit images → extracts features → trains CNN → predicts digits → checks performance.
+
+Real-life use
+
+CNN used in:
+
+face unlock
+medical imaging
+OCR
+self-driving
+handwritten recognition
+
+DL LAB ASSIGNMENT 7
+Main concept used
+CNN (Convolutional Neural Network)
+
+CNN is best for image processing tasks:
+
+disease detection
+face recognition
+object detection
+medical scans
+
+Here:
+
+Plant leaf images → disease class prediction.
+
+What your code does
+
+It:
+
+downloads dataset from Kaggle
+loads plant images
+preprocesses them
+trains CNN
+validates model
+shows accuracy graph
+Step-by-step explanation
+Install Kaggle
+!pip install kaggle
+
+Installs Kaggle API.
+
+Used to download dataset.
+
+Upload kaggle.json
+files.upload()
+
+Uploads Kaggle API key.
+
+Needed for authentication.
+
+Setup credentials
+!mkdir -p ~/.kaggle
+
+Creates hidden folder.
+
+Stores Kaggle credentials.
+
+Download dataset
+!kaggle datasets download -d emmarex/plantdisease
+
+Downloads PlantVillage dataset.
+
+Unzip
+!unzip plantdisease.zip
+
+Extracts image folders.
+
+Import libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+
+Using TensorFlow.
+
+ImageDataGenerator
+
+Very important.
+
+What is ImageDataGenerator?
+
+Loads image data in batches.
+
+Also preprocessing.
+
+Code
+datagen = ImageDataGenerator()
+
+Used for:
+
+rescaling
+splitting
+augmentation
+Rescaling
+rescale = 1./255
+
+Normalizes pixel values.
+
+Formula:
+
+x
+′
+=
+255
+x
+	​
+
+
+Validation split
+validation_split=0.2
+
+Means:
+
+20% data for validation.
+
+80% training.
+
+flow_from_directory
+flow_from_directory()
+
+Reads images from folders.
+
+Each folder = one class.
+
+Example folder structure
+PlantVillage/
+ ├── Tomato___Healthy
+ ├── Tomato___Late_blight
+ ├── Potato___Early_blight
+
+Each folder label becomes class.
+
+Target size
+target_size=(128,128)
+
+All images resized to 128×128.
+
+Batch size
+batch_size=32
+
+Processes 32 images at once.
+
+CNN Model
+Sequential model
+Sequential()
+
+Layers added one after another.
+
+Block 1
+Conv2D(32)
+
+32 filters.
+
+Extracts low-level features.
+
+Like:
+
+edges
+spots
+lesions
+
+Visual:
+
+7
+MaxPooling
+MaxPooling2D(2,2)
+
+Reduces image dimensions.
+
+Example:
+
+128×128 → 64×64
+
+Block 2
+Conv2D(64)
+
+Learns more complex features.
+
+Block 3
+Conv2D(128)
+
+Deep features.
+
+Disease patterns.
+
+Flatten
+Flatten()
+
+Converts 2D to 1D vector.
+
+Dense Layer
+Dense(128)
+
+Fully connected layer.
+
+Makes final decision.
+
+Dropout
+Dropout(0.5)
+
+Drops 50% neurons.
+
+Used to prevent overfitting.
+
+Output Layer
+Dense(train_data.num_classes)
+
+Output neurons = number of diseases.
+
+Softmax
+
+Used for multiclass classification.
+
+Formula:
+
+P(y
+i
+	​
+
+)=
+∑
+j
+	​
+
+e
+z
+j
+	​
+
+e
+z
+i
+	​
+
+	​
+
+
+Compile
+model.compile()
+Optimizer
+
+Adam.
+
+Updates weights.
+
+Loss
+
+categorical_crossentropy
+
+Formula:
+
+L=−∑ylog(
+y
+^
+	​
+
+)
+
+Training
+model.fit()
+
+Trains CNN.
+
+epochs=7
+
+Means:
+
+7 complete cycles.
+
+Validation data
+
+Checks performance during training.
+
+Evaluate
+model.evaluate()
+
+Calculates validation accuracy.
+
+Accuracy graph
+plt.plot()
+
+Shows:
+
+training accuracy
+validation accuracy
+6
+Workflow
+Download dataset
+↓
+Load images
+↓
+Normalize
+↓
+Split train/validation
+↓
+Build CNN
+↓
+Train
+↓
+Validate
+↓
+Evaluate
+↓
+Plot graph
+Important concepts used
+1. CNN
+
+Image classification.
+
+2. Convolution
+
+Feature extraction.
+
+3. Pooling
+
+Dimension reduction.
+
+4. Dropout
+
+Reduce overfitting.
+
+5. Softmax
+
+Multiclass output.
+
+6. Image preprocessing
+
+Rescaling.
+
+7. Batch processing
+
+Training efficiency.
+
+Viva Questions
+Why CNN for plant disease?
+
+Because images are used.
+
+Why rescale?
+
+Normalize pixels.
+
+Why dropout?
+
+Avoid overfitting.
+
+Why softmax?
+
+Many classes.
+
+Why validation split?
+
+Evaluate during training.
+
+What does Conv2D do?
+
+Extract image features.
+
+Why max pooling?
+
+Reduce image size.
+
+Real-life applications
+
+Used in:
+
+smart farming
+leaf disease detection
+crop monitoring
+agriculture AI
+precision farming
+Easy understanding
+
+Your code:
+
+Takes plant leaf photos → CNN learns disease patterns → predicts disease class → evaluates performance.
+
+One simple line
+
+It automatically detects plant diseases from leaf images using deep learning.
+
+DL LAB ASSIGNMENT 8
+Main concept used
+CNN (Convolutional Neural Network)
+
+CNN is a deep learning model for images.
+
+Used in:
+
+fashion classification
+object detection
+medical images
+face recognition
+
+Your code classifies fashion products.
+
+What your code does
+
+It:
+
+loads Fashion-MNIST
+displays sample images
+converts grayscale to RGB
+builds CNN
+trains
+evaluates
+predicts class
+Step-by-step explanation
+Import libraries
+import tensorflow as tf
+from tensorflow.keras import layers, models
+
+Using TensorFlow.
+
+Load dataset
+fashion_mnist = tf.keras.datasets.fashion_mnist
+
+Loads fashion dataset.
+
+Classes
+
+10 categories:
+
+T-shirt
+Trouser
+Pullover
+Dress
+Coat
+Sandal
+Shirt
+Sneaker
+Bag
+Ankle boot
+Show images
+plt.imshow()
+
+Displays sample clothing images.
+
+You used viridis colormap, so grayscale looks colored.
+
+5
+Preprocessing
+Normalize
+x_train = x_train / 255.0
+
+Converts pixel values:
+
+0–255 → 0–1
+
+Formula:
+
+x
+′
+=
+255
+x
+	​
+
+
+Convert grayscale to RGB
+
+Important.
+
+Why?
+
+Original image:
+
+28×28×1
+
+Converted:
+
+28×28×3
+
+Code
+np.stack((x_train,)*3, axis=-1)
+
+Copies grayscale into 3 channels.
+
+Result
+(60000, 28, 28, 3)
+
+Means:
+
+60000 images
+28×28
+RGB
+CNN Model
+First Conv layer
+Conv2D(32,(3,3))
+
+32 filters.
+
+Detects:
+
+edges
+patterns
+shapes
+Batch Normalization
+
+Very important.
+
+What is BatchNormalization?
+
+Normalizes outputs between layers.
+
+Benefits:
+
+stable training
+faster learning
+less internal variation
+MaxPooling
+MaxPooling2D((2,2))
+
+Reduces size.
+
+Example:
+
+28×28 → 14×14
+
+Second Conv
+Conv2D(64)
+
+More features.
+
+Third Conv
+Conv2D(128)
+
+Deep features.
+
+Flatten
+Flatten()
+
+Converts matrix → vector.
+
+Dense layer
+Dense(128)
+
+Fully connected layer.
+
+Learns classification.
+
+Dropout
+Dropout(0.5)
+
+Drops 50% neurons.
+
+Purpose:
+
+avoid overfitting.
+
+Output layer
+Dense(10, activation='softmax')
+
+10 classes.
+
+Softmax
+
+Formula:
+
+P(y
+i
+	​
+
+)=
+∑
+j
+	​
+
+e
+z
+j
+	​
+
+e
+z
+i
+	​
+
+	​
+
+
+Returns probability.
+
+Compile
+model.compile()
+Optimizer
+
+Adam.
+
+Used to update weights.
+
+Loss
+
+sparse_categorical_crossentropy
+
+Used when labels are integers.
+
+Difference:
+
+sparse categorical
+
+labels = 0,1,2...
+
+categorical
+
+one-hot encoded.
+
+Train
+model.fit()
+epochs=10
+
+10 complete passes.
+
+batch_size=64
+
+64 images processed together.
+
+Validation
+validation_data=(x_test,y_test)
+
+Tests performance while training.
+
+Evaluate
+model.evaluate()
+
+Gives test accuracy.
+
+Accuracy graph
+plt.plot()
+
+Shows:
+
+train accuracy
+validation accuracy
+5
+Prediction
+predictions = model.predict()
+
+Predicts classes.
+
+np.argmax
+np.argmax()
+
+Selects highest probability.
+
+Example
+
+If output:
+
+[0.01,0.02,0.90,...]
+
+Class = index of max.
+
+Workflow
+Load Fashion-MNIST
+↓
+Display images
+↓
+Normalize
+↓
+Convert RGB
+↓
+Build CNN
+↓
+Train
+↓
+Evaluate
+↓
+Plot graph
+↓
+Predict
+Important concepts used
+1. CNN
+
+Image classification.
+
+2. Convolution
+
+Feature extraction.
+
+3. Pooling
+
+Reduce size.
+
+4. Batch normalization
+
+Stable training.
+
+5. Dropout
+
+Reduce overfitting.
+
+6. Softmax
+
+Multiclass output.
+
+Why RGB conversion?
+
+Original images are grayscale.
+
+Your model accepts 3-channel input.
+
+So converted.
+
+Viva Questions
+What is Fashion-MNIST?
+
+Dataset of clothing images.
+
+Why CNN?
+
+Image classification.
+
+Why BatchNormalization?
+
+Stable and faster training.
+
+Why Dropout?
+
+Avoid overfitting.
+
+Why softmax?
+
+10 classes.
+
+Why RGB conversion?
+
+To create 3-channel input.
+
+Real-life applications
+
+Used in:
+
+e-commerce image classification
+apparel recognition
+recommendation systems
+automated fashion tagging
+Easy understanding
+
+Your code:
+
+Takes clothing images → CNN learns patterns → predicts clothing type.
+
+One simple line
+
+It classifies clothing images into categories using deep learning.
+
+DL LAB ASSIGNMENT 9
+
+Main concept used
+LSTM (Long Short-Term Memory)
+
+LSTM is a special type of RNN (Recurrent Neural Network).
+
+Used for:
+
+stock prediction
+weather prediction
+speech recognition
+text generation
+sequence learning
+Why LSTM?
+
+Normal neural networks do not remember previous values.
+
+Stock prices depend on past prices.
+
+LSTM can remember previous time steps.
+
+Your dataset
+
+The file Stock_prices.csv contains historical stock values.
+
+You are using:
+
+Close price
+
+Only closing price is used for prediction.
+
+Code explanation
+Import libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+Basic libraries.
+
+from sklearn.preprocessing import MinMaxScaler
+
+Used for normalization.
+
+from tensorflow.keras.layers import LSTM
+
+Using TensorFlow for LSTM.
+
+Load dataset
+dataset = pd.read_csv("Stock_prices.csv")
+
+Reads stock data.
+
+Likely columns:
+
+Open
+High
+Low
+Close
+Volume
+Convert close column
+pd.to_numeric()
+
+Converts values to numeric.
+
+Why?
+
+Sometimes CSV may contain text values.
+
+This removes invalid entries.
+
+Drop missing values
+dropna()
+
+Removes empty rows.
+
+Extract close values
+data = dataset['Close'].values
+
+Uses closing price only.
+
+Reshape
+reshape(-1,1)
+
+Converts 1D to 2D array.
+
+Required by scaler.
+
+Normalization
+
+Important.
+
+MinMaxScaler
+MinMaxScaler(feature_range=(0,1))
+
+Scales data between 0 and 1.
+
+Formula:
+
+x
+′
+=
+x
+max
+	​
+
+−x
+min
+	​
+
+x−x
+min
+	​
+
+	​
+
+
+Why normalize?
+
+Helps faster learning.
+
+Create sequences
+
+Most important.
+
+Loop
+for i in range(60, len(scaled_data))
+
+Uses previous 60 days to predict next day.
+
+Example
+
+Input:
+
+day 1–60
+
+Output:
+
+day 61
+
+Then:
+
+day 2–61 → predict day 62
+
+This creates time sequences.
+
+Visual:
+
+5
+X_train
+
+Stores past 60 days.
+
+y_train
+
+Stores next value.
+
+Reshape for LSTM
+X_train = np.reshape()
+
+Shape:
+
+(samples, timesteps, features)
+
+Here
+samples = total sequences
+timesteps = 60
+features = 1
+Build model
+Sequential
+Sequential()
+
+Adds layers in order.
+
+First LSTM
+LSTM(units=50, return_sequences=True)
+
+50 neurons.
+
+return_sequences=True
+
+Needed because next LSTM layer follows.
+
+Passes full sequence.
+
+Second LSTM
+LSTM(units=50)
+
+Processes sequence and outputs final state.
+
+Dense layer
+Dense(units=1)
+
+Single output:
+
+next stock price.
+
+Compile
+model.compile()
+Optimizer
+
+Adam.
+
+Updates weights.
+
+Loss
+
+Mean squared error.
+
+Formula:
+
+MSE=
+n
+1
+	​
+
+∑(y
+i
+	​
+
+−
+y
+^
+	​
+
+i
+	​
+
+)
+2
+
+Train
+model.fit()
+
+Parameters:
+
+epochs=20
+
+20 full training cycles.
+
+batch_size=32
+
+32 samples per batch.
+
+Test preparation
+test_data
+scaled_data[-100:]
+
+Last 100 records used.
+
+Prediction
+model.predict()
+
+Predicts future prices.
+
+Inverse transform
+scaler.inverse_transform()
+
+Converts normalized values back.
+
+Because output currently 0–1.
+
+Plot
+plt.plot()
+
+Blue = actual
+Red = predicted
+
+5
+Workflow
+Load stock data
+↓
+Extract close prices
+↓
+Normalize
+↓
+Create 60-day sequences
+↓
+Build LSTM
+↓
+Train
+↓
+Predict
+↓
+Inverse transform
+↓
+Plot
+Important concepts used
+1. Time series
+
+Data over time.
+
+2. LSTM
+
+Sequence prediction.
+
+3. RNN
+
+Recurrent architecture.
+
+4. Sliding window
+
+60-day input.
+
+5. Normalization
+
+Scale data.
+
+6. Regression
+
+Predict continuous value.
+
+Why 60 days?
+
+Uses 60 previous prices to learn trend.
+
+This is called look-back window.
+
+Viva questions
+What is LSTM?
+
+Special RNN for sequence learning.
+
+Why LSTM for stock?
+
+Stock depends on previous values.
+
+Why normalize?
+
+Stable training.
+
+What is timestep?
+
+Number of previous observations.
+
+Why 60?
+
+Past 60 days input.
+
+Why inverse transform?
+
+Restore original scale.
+
+Real-life use
+
+Used in:
+
+stock forecasting
+weather prediction
+energy demand
+traffic prediction
+cryptocurrency forecasting
+Easy understanding
+
+Your code:
+
+Uses previous 60 stock prices → learns patterns → predicts next price.
+
+One simple line
+
+It predicts future stock price using past stock history with LSTM.
+
+DL LAB ASSIGNMENT 10
+This code performs weather forecasting using LSTM (Long Short-Term Memory) to predict future temperature values based on past temperature data.
+
+It is a time-series prediction problem using deep learning.
+
+This is very similar to your stock prediction code, but here it predicts temperature instead of stock prices.
+
+Main concept used
+Time Series Forecasting
+
+Time series means:
+
+Data collected over time.
+
+Examples:
+
+temperature
+rainfall
+stock prices
+traffic flow
+electricity demand
+
+Since weather changes over time, previous temperature helps predict future temperature.
+
+Why LSTM?
+
+LSTM is designed for sequential/time-dependent data.
+
+Weather depends on previous days.
+
+Example:
+
+Tomorrow’s temperature depends on previous temperature trends.
+
+What your code does
+
+It:
+
+loads weather data
+normalizes temperature values
+creates sequences
+trains LSTM
+predicts temperature
+compares actual vs predicted values
+Step-by-step explanation
+Import libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+Basic libraries.
+
+from sklearn.preprocessing import MinMaxScaler
+
+For normalization.
+
+from tensorflow.keras.layers import LSTM
+
+Using TensorFlow for LSTM.
+
+Load dataset
+df = pd.read_csv('weather.csv')
+
+Loads weather dataset.
+
+Likely columns:
+
+date
+temperature
+humidity
+pressure
+Convert date
+pd.to_datetime()
+
+Converts date column into datetime format.
+
+Set date as index
+df.set_index('date')
+
+Makes date the timeline index.
+
+Useful for plotting.
+
+Select temperature column
+data = df[['temperature']].values
+
+Uses only temperature for prediction.
+
+Normalize data
+MinMaxScaler(feature_range=(0,1))
+
+Scales values between 0 and 1.
+
+Formula:
+
+x
+′
+=
+x
+max
+	​
+
+−x
+min
+	​
+
+x−x
+min
+	​
+
+	​
+
+
+Why normalize?
+
+Helps neural network learn efficiently.
+
+Create sequences
+
+Very important.
+
+Function
+create_dataset()
+
+Creates training sequences.
+
+time_step = 10
+
+This means:
+
+Use previous 10 temperature values to predict next value.
+
+Example
+
+Input:
+
+Day 1–10
+
+Output:
+
+Day 11
+
+Then:
+
+Day 2–11 → predict Day 12
+
+This is called a sliding window.
+
+Visualization:
+
+7
+Reshape
+X.reshape(samples, time_steps, features)
+
+LSTM requires 3D input.
+
+Here
+samples = number of sequences
+time_steps = 10
+features = 1 (temperature)
+Train-test split
+train_size = int(len(X)*0.8)
+
+80% training
+20% testing
+
+Why sequential split?
+
+For time-series, order matters.
+
+Random split would break sequence.
+
+Build model
+Sequential model
+Sequential()
+
+Layers added one by one.
+
+First LSTM layer
+LSTM(50, return_sequences=True)
+
+50 memory units.
+
+return_sequences=True
+
+Passes sequence to next LSTM layer.
+
+Second LSTM
+LSTM(50)
+
+Processes sequence.
+
+Outputs final hidden state.
+
+Dense layer
+Dense(1)
+
+Single output:
+
+predicted temperature.
+
+Compile
+model.compile()
+Loss function
+
+Mean squared error.
+
+Formula:
+
+MSE=
+n
+1
+	​
+
+∑(y
+i
+	​
+
+−
+y
+^
+	​
+
+i
+	​
+
+)
+2
+
+Optimizer
+
+Adam.
+
+Updates weights efficiently.
+
+Train model
+model.fit()
+
+Parameters:
+
+epochs=20
+
+20 full learning cycles.
+
+batch_size=32
+
+Processes 32 sequences at once.
+
+validation_data
+
+Checks performance during training.
+
+Prediction
+model.predict()
+
+Predicts temperatures.
+
+Inverse scaling
+inverse_transform()
+
+Converts normalized output back to original temperature scale.
+
+Plot results
+plt.plot()
+
+Shows:
+
+Actual temperature
+Train predictions
+Test predictions
+6
+Workflow
+Load weather data
+↓
+Normalize
+↓
+Create 10-step sequences
+↓
+Train-test split
+↓
+Build LSTM
+↓
+Train
+↓
+Predict
+↓
+Inverse transform
+↓
+Plot
+Important concepts used
+1. Time series forecasting
+
+Prediction over time.
+
+2. LSTM
+
+Sequence learning.
+
+3. Sliding window
+
+10-step input.
+
+4. Normalization
+
+Scale data.
+
+5. Sequential split
+
+Preserve time order.
+
+6. Regression
+
+Predict continuous value.
+
+Difference from stock prediction code
+
+Your stock model:
+
+time_step = 60
+predicts stock price
+
+This weather model:
+
+time_step = 10
+predicts temperature
+
+Same LSTM concept.
+
+Viva questions
+What is time series?
+
+Data recorded over time.
+
+Why use LSTM?
+
+Handles sequential dependencies.
+
+Why not random split?
+
+Would break temporal order.
+
+What is time_step?
+
+Number of previous observations used.
+
+Why inverse transform?
+
+Restore original scale.
+
+Why two LSTM layers?
+
+Learn deeper temporal patterns.
+
+Real-life applications
+
+Used in:
+
+weather forecasting
+rainfall prediction
+traffic forecasting
+electricity demand
+climate analysis
+Easy understanding
+
+Your code:
+
+Uses previous 10 temperatures → learns weather trend → predicts next temperature.
+
+One simple line
+
+It predicts future temperature using past weather data with LSTM.
+
+Link 
+https://chatgpt.com/share/6a0da3fd-8ae0-83a2-899e-8c242bf8c54b
