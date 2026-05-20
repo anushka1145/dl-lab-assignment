@@ -3607,3 +3607,18 @@ It predicts future temperature using past weather data with LSTM.
 
 Link 
 https://chatgpt.com/share/6a0da3fd-8ae0-83a2-899e-8c242bf8c54b
+
+python -m pip install numpy pandas matplotlib scikit-learn seaborn jupyter ipykernel
+python -m pip install tensorflow
+python -m pip install matplotlib
+python -m pip install pillow
+
+pip install numpy pandas matplotlib scikit-learn tensorflow seaborn
+pip install kaggle
+pip install --upgrade pip
+pip install numpy
+pip install pandas
+pip install matplotlib
+pip install scikit-learn
+pip install seaborn
+pip install tensorflow
